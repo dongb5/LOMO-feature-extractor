@@ -4,6 +4,7 @@ import numpy as np
 def SILTP4(img, R, tau):    
 
     if len(img.shape) > 2:
+        img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     img_pad = np.pad(img, R, 'edge')
