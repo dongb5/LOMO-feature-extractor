@@ -6,7 +6,6 @@ import siltp
 import channel_histogram
 
 def averagePooling(img):
-
     if img.shape[0] % 2 != 0:
         img = img[:-1]    
     if img.shape[1] % 2 != 0:
@@ -15,7 +14,7 @@ def averagePooling(img):
     img_pool = img[0::2] + img[1::2]
     img_pool = img_pool[:, 0::2] + img_pool[:, 1::2]
 
-    img_pool /= 4
+    img_pool = img_pool / 4
 
     return img_pool    
 
@@ -41,8 +40,8 @@ def LOMO(img, config):
     for pool in range(3):
         row_num = (img.shape[0] - (block_size - block_step)) / block_step
         col_num = (img.shape[1] - (block_size - block_step)) / block_step
-        for row in range(row_num):
-            for col in range(col_num):
+        for row in range(int(row_num)):
+            for col in range(int(col_num)):
                 img_block = img[
                     row*block_step:row*block_step+block_size,
                     col*block_step:col*block_step+block_size
@@ -62,7 +61,7 @@ def LOMO(img, config):
                     col*block_step:col*block_step+block_size
                 ]                
                     
-                img_hsv = cv2.cvtColor(img_block, cv2.COLOR_BGR2HSV)
+                img_hsv = cv2.cvtColor(img_block.astype(np.uint8), cv2.COLOR_BGR2HSV)
                 hsv_hist = channel_histogram.jointHistogram(
                     img_hsv,
                     [0, 255],
@@ -83,8 +82,8 @@ def LOMO(img, config):
         img_retinex = averagePooling(img_retinex)
 
     siltp_feat = np.log(siltp_feat + 1.0)
-    siltp_feat[:siltp_feat.shape[0]/2] /= np.linalg.norm(siltp_feat[:siltp_feat.shape[0]/2])
-    siltp_feat[siltp_feat.shape[0]/2:] /= np.linalg.norm(siltp_feat[siltp_feat.shape[0]/2:])    
+    siltp_feat[:int(siltp_feat.shape[0]/2)] /= np.linalg.norm(siltp_feat[:int(siltp_feat.shape[0]/2)])
+    siltp_feat[int(siltp_feat.shape[0]/2):] /= np.linalg.norm(siltp_feat[int(siltp_feat.shape[0]/2):])    
     
     hsv_feat = np.log(hsv_feat + 1.0)
     hsv_feat /= np.linalg.norm(hsv_feat)
